@@ -39,7 +39,7 @@ class BookingServiceTest {
         every { deskRepository.findById(1L) } returns Optional.of(desk)
         every { employeeRepository.findById(1L) } returns Optional.of(employee)
 
-        assertThrows(IllegalArgumentException::class.java) {
+        assertThrows(com.example.office.exception.DepartmentMismatchException::class.java) {
             bookingService.reserveDesk(1L, 1L)
         }
 
@@ -73,5 +73,47 @@ class BookingServiceTest {
         assert(results.size == 2)
         assert(results.all { it.isOccupied })
         verify { deskRepository.findAllByIsOccupiedTrue() }
+    }
+
+    @Test
+    fun `Test 1 - should throw DepartmentMismatchException when Marketing employee tries to book Engineering desk`() {
+        val desk = Desk(id = 10L, deskCode = "4B-10", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = false)
+        val employee = Employee(id = 5L, name = "Mark", department = "MARKETING")
+
+        every { deskRepository.findById(10L) } returns Optional.of(desk)
+        every { employeeRepository.findById(5L) } returns Optional.of(employee)
+
+        assertThrows(com.example.office.exception.DepartmentMismatchException::class.java) {
+            bookingService.reserveDesk(10L, 5L)
+        }
+    }
+
+    @Test
+    fun `Test 2 - should successfully book floor 4 desk for Engineering employee`() {
+        val desk = Desk(id = 11L, deskCode = "4B-11", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = false)
+        val employee = Employee(id = 6L, name = "Engie", department = "ENGINEERING")
+
+        every { deskRepository.findById(11L) } returns Optional.of(desk)
+        every { employeeRepository.findById(6L) } returns Optional.of(employee)
+        every { deskRepository.save(any()) } returns desk
+
+        bookingService.reserveDesk(11L, 6L)
+
+        verify { deskRepository.save(match { it.isOccupied && it.deskCode == "4B-11" }) }
+    }
+
+    @Test
+    fun `Test 3 - should throw OptimisticLockingFailureException simulation`() {
+        val desk = Desk(id = 12L, deskCode = "4B-12", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = false)
+        val employee = Employee(id = 7L, name = "Concurrent User", department = "ENGINEERING")
+
+        every { deskRepository.findById(12L) } returns Optional.of(desk)
+        every { employeeRepository.findById(7L) } returns Optional.of(employee)
+        // Simulate race condition failure at save time
+        every { deskRepository.save(any()) } throws org.springframework.dao.OptimisticLockingFailureException("Race condition detected")
+
+        assertThrows(org.springframework.dao.OptimisticLockingFailureException::class.java) {
+            bookingService.reserveDesk(12L, 7L)
+        }
     }
 }

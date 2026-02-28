@@ -29,4 +29,30 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
             .andExpect(jsonPath("$[0].deskCode").value("1A-01"))
             .andExpect(jsonPath("$[0].isOccupied").value(true))
     }
+
+    @Test
+    fun `should return 403 when department mismatch occurs`() {
+        every { bookingService.reserveDesk(any(), any()) } throws com.example.office.exception.DepartmentMismatchException("Mismatch")
+
+        val body = "{\"deskId\": 1, \"employeeId\": 1}"
+        
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/bookings")
+            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .content(body))
+            .andExpect(status().isForbidden)
+            .andExpect(jsonPath("$.message").value("Mismatch"))
+    }
+
+    @Test
+    fun `should return 409 when desk is already occupied`() {
+        every { bookingService.reserveDesk(any(), any()) } throws IllegalStateException("Occupied")
+
+        val body = "{\"deskId\": 1, \"employeeId\": 1}"
+        
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/bookings")
+            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .content(body))
+            .andExpect(status().isConflict)
+            .andExpect(jsonPath("$.message").value("Occupied"))
+    }
 }

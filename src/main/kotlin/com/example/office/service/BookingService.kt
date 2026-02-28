@@ -31,7 +31,7 @@ class BookingService(
         }
 
         if (employee.department != desk.departmentZone) {
-            throw IllegalArgumentException("Employee department does not match desk zone")
+            throw com.example.office.exception.DepartmentMismatchException("Employee department does not match desk zone")
         }
         
         desk.isOccupied = true

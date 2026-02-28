@@ -32,7 +32,7 @@ dependencies {
         // Exclude Mockito to ensure we only use MockK
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    
+
     // Required for Gradle to detect and run JUnit 5 tests
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

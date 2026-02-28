@@ -5,12 +5,12 @@ data class DeskResponse(
     val deskCode: String,
     val floorNumber: Int,
     val departmentZone: String,
-    val isOccupied: Boolean
+    val isOccupied: Boolean,
 )
 
 data class BookingResponse(
     val bookingId: Long,
     val desk: DeskResponse,
     val employeeName: String,
-    val employeeDepartment: String
+    val employeeDepartment: String,
 )

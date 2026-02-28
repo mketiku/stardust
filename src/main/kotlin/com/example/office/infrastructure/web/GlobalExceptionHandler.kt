@@ -1,22 +1,21 @@
 package com.example.office.infrastructure.web
 
 import com.example.office.domain.exception.DepartmentMismatchException
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.dao.OptimisticLockingFailureException
 import java.time.LocalDateTime
 
 data class ErrorResponse(
     val status: Int,
     val message: String?,
-    val timestamp: LocalDateTime = LocalDateTime.now()
+    val timestamp: LocalDateTime = LocalDateTime.now(),
 )
 
 @ControllerAdvice
 class GlobalExceptionHandler {
-
     @ExceptionHandler(DepartmentMismatchException::class)
     fun handleDepartmentMismatch(ex: DepartmentMismatchException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(HttpStatus.FORBIDDEN.value(), ex.message)

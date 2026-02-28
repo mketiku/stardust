@@ -1,22 +1,21 @@
 package com.example.office.domain.model
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Version
 
 @Entity
 class Desk(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     @Column(unique = true, nullable = false)
     val deskCode: String,
-
     val floorNumber: Int,
-
     val departmentZone: String,
-
     var isOccupied: Boolean = false,
-
     @Version
-    val version: Long = 0
+    val version: Long = 0,
 )

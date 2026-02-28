@@ -1,32 +1,40 @@
 package com.example.office.infrastructure.web
 
+import com.example.office.domain.exception.DepartmentMismatchException
+import com.example.office.domain.model.Booking
 import com.example.office.domain.model.Desk
 import com.example.office.domain.model.Employee
-import com.example.office.domain.model.Booking
 import com.example.office.domain.service.BookingService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(BookingController::class)
-class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
-
+class BookingControllerTest(
+    @Autowired val mockMvc: MockMvc,
+) {
     @MockkBean
     private lateinit var bookingService: BookingService
 
     @Test
     fun `should return all current bookings`() {
         val occupiedDesk = Desk(id = 1L, deskCode = "1A-01", floorNumber = 1, departmentZone = "ENG", isOccupied = true)
-        
+
         every { bookingService.getCurrentBookings() } returns listOf(occupiedDesk)
 
         mockMvc.perform(get("/api/bookings"))
-            .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+            .andDo(print())
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].deskCode").value("1A-01"))
             .andExpect(jsonPath("$[0].isOccupied").value(true))
@@ -52,23 +60,29 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
         every { bookingService.reserveDesk(any(), any()) } returns 100L
 
         val body = "{\"deskId\": 1, \"employeeId\": 1}"
-        
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/bookings")
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            .content(body))
+
+        mockMvc.perform(
+            post("/api/bookings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body),
+        )
             .andExpect(status().isOk)
             .andExpect(content().string("100"))
     }
 
     @Test
     fun `should return 403 when department mismatch occurs`() {
-        every { bookingService.reserveDesk(any(), any()) } throws com.example.office.domain.exception.DepartmentMismatchException("Mismatch")
+        every {
+            bookingService.reserveDesk(any(), any())
+        } throws DepartmentMismatchException("Mismatch")
 
         val body = "{\"deskId\": 1, \"employeeId\": 1}"
-        
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/bookings")
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            .content(body))
+
+        mockMvc.perform(
+            post("/api/bookings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body),
+        )
             .andExpect(status().isForbidden)
             .andExpect(jsonPath("$.message").value("Mismatch"))
     }
@@ -78,10 +92,12 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
         every { bookingService.reserveDesk(any(), any()) } throws IllegalStateException("Occupied")
 
         val body = "{\"deskId\": 1, \"employeeId\": 1}"
-        
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/bookings")
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-            .content(body))
+
+        mockMvc.perform(
+            post("/api/bookings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body),
+        )
             .andExpect(status().isConflict)
             .andExpect(jsonPath("$.message").value("Occupied"))
     }
@@ -90,7 +106,7 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `should return 204 when booking is cancelled`() {
         every { bookingService.cancelBooking(100L) } returns Unit
 
-        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/bookings/100"))
+        mockMvc.perform(delete("/api/bookings/100"))
             .andExpect(status().isNoContent)
     }
 }

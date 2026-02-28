@@ -56,4 +56,10 @@ class BookingService(
     fun getCurrentBookings(): List<Desk> {
         return deskRepository.findAllByIsOccupiedTrue()
     }
+
+    fun getBooking(bookingId: Long): Booking {
+        return bookingRepository.findById(bookingId).orElseThrow {
+            RuntimeException("Booking not found")
+        }
+    }
 }

@@ -21,11 +21,37 @@ Chosen for type safety, performance, and developer experience:
 
 ## System Architecture & Patterns
 
-The implementation follows standard Clean Architecture principles:
+The implementation follows **Hexagonal Architecture (Ports & Adapters)** principles to ensure high maintainability and decoupling of business logic from infrastructure.
 
-- **Entities**: Foundational data models (`Desk`, `Employee`) that encapsulate core attributes.
-- **Service Layer**: Where the business rules live. Our `BookingService` is designed to be transactional and atomic.
-- **Controller Layer**: A clean REST interface (`/api/bookings`) that bridges external requests to our internal domain logic.
+### Architectural Overview
+
+```mermaid
+graph TD
+    subgraph Infrastructure
+        Web[BookingController]
+        DB[JpaRepositories]
+    end
+
+    subgraph Domain
+        Service[BookingService]
+        Port[RepositoryPorts]
+        Model[Entities & Exceptions]
+    end
+
+    subgraph DTO
+        Response[Booking/Desk DTOs]
+    end
+
+    Web --> Service
+    Service --> Port
+    DB -- implements --> Port
+    Web -- maps to --> Response
+```
+
+- **Domain Layer**: The heart of the application containing pure business logic (`BookingService`) and entity models. It remains agnostic of the database or web framework.
+- **Port Layer**: Interface definitions for out-bound communication (e.g., `DeskRepository`).
+- **Infrastructure Layer**: Technical implementations of the ports (JPA/Hibernate) and entry points for the application (REST Controllers).
+- **DTO Pattern**: We use Data Transfer Objects to ensure that internal persistence models never leak to the API, allowing the contract to evolve independently of the database schema.
 
 ## The TDD Workflow
 

@@ -141,4 +141,18 @@ class BookingServiceTest {
         verify { deskRepository.save(match { !it.isOccupied }) }
         verify { bookingRepository.delete(booking) }
     }
+
+    @Test
+    fun `should return booking when valid id is provided`() {
+        val desk = Desk(id = 1L, deskCode = "4B-01", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = true)
+        val employee = Employee(id = 1L, name = "Alice", department = "ENGINEERING")
+        val booking = Booking(id = 100L, desk = desk, employee = employee)
+
+        every { bookingRepository.findById(100L) } returns Optional.of(booking)
+
+        val result = bookingService.getBooking(100L)
+
+        assert(result.id == 100L)
+        assert(result.employee.name == "Alice")
+    }
 }

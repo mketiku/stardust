@@ -1,6 +1,8 @@
 package com.example.office.infrastructure.web
 
 import com.example.office.domain.model.Desk
+import com.example.office.domain.model.Employee
+import com.example.office.domain.model.Booking
 import com.example.office.domain.service.BookingService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -28,6 +30,21 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].deskCode").value("1A-01"))
             .andExpect(jsonPath("$[0].isOccupied").value(true))
+    }
+
+    @Test
+    fun `should return booking detail for valid id`() {
+        val desk = Desk(id = 1L, deskCode = "4B-01", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = true)
+        val employee = Employee(id = 1L, name = "Alice", department = "ENGINEERING")
+        val booking = Booking(id = 100L, desk = desk, employee = employee)
+
+        every { bookingService.getBooking(100L) } returns booking
+
+        mockMvc.perform(get("/api/bookings/100"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.bookingId").value(100))
+            .andExpect(jsonPath("$.desk.deskCode").value("4B-01"))
+            .andExpect(jsonPath("$.employeeName").value("Alice"))
     }
 
     @Test

@@ -1,0 +1,8 @@
+name: Get Booking by ID
+type: http
+seq: 5
+request:
+  url: http://localhost:8080/api/bookings/1
+  method: GET
+  body: none
+  auth: none

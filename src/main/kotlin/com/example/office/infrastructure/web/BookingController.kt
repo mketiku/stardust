@@ -1,6 +1,7 @@
 package com.example.office.infrastructure.web
 
 import com.example.office.domain.service.BookingService
+import com.example.office.dto.BookingResponse
 import com.example.office.dto.DeskResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -21,15 +22,19 @@ class BookingController(
     @GetMapping
     @Operation(summary = "List current bookings", description = "Returns all desks that are currently marked as occupied.")
     fun getBookings(): List<DeskResponse> {
-        return bookingService.getCurrentBookings().map { desk ->
-            DeskResponse(
-                id = desk.id!!,
-                deskCode = desk.deskCode,
-                floorNumber = desk.floorNumber,
-                departmentZone = desk.departmentZone,
-                isOccupied = desk.isOccupied
-            )
-        }
+        return bookingService.getCurrentBookings().map { markAsDeskResponse(it) }
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a specific booking", description = "Retrieves details about an existing reservation.")
+    fun getBooking(@PathVariable id: Long): BookingResponse {
+        val booking = bookingService.getBooking(id)
+        return BookingResponse(
+            bookingId = booking.id!!,
+            desk = markAsDeskResponse(booking.desk),
+            employeeName = booking.employee.name,
+            employeeDepartment = booking.employee.department
+        )
     }
 
     @DeleteMapping("/{id}")
@@ -38,6 +43,14 @@ class BookingController(
     fun cancelBooking(@PathVariable id: Long) {
         bookingService.cancelBooking(id)
     }
+
+    private fun markAsDeskResponse(desk: com.example.office.domain.model.Desk) = DeskResponse(
+        id = desk.id!!,
+        deskCode = desk.deskCode,
+        floorNumber = desk.floorNumber,
+        departmentZone = desk.departmentZone,
+        isOccupied = desk.isOccupied
+    )
 }
 
 data class BookingRequest(

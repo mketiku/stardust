@@ -1,0 +1,8 @@
+name: List Active Docks
+type: http
+seq: 1
+request:
+  url: http://localhost:8080/api/docking/active
+  method: GET
+  body: none
+  auth: none

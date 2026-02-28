@@ -7,7 +7,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
-group = "com.example"
+group = "com.example.stardust"
 version = "0.0.1-SNAPSHOT"
 
 java {

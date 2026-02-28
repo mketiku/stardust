@@ -1,0 +1,8 @@
+name: Get Docking Manifest
+type: http
+seq: 3
+request:
+  url: http://localhost:8080/api/docking/manifest/1
+  method: GET
+  body: none
+  auth: none

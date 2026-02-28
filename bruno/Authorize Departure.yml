@@ -1,0 +1,8 @@
+name: Authorize Departure
+type: http
+seq: 4
+request:
+  url: http://localhost:8080/api/docking/depart/1
+  method: DELETE
+  body: none
+  auth: none

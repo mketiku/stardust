@@ -4,19 +4,17 @@
 Accepted
 
 ## Context
-Concurrent desk bookings are highly likely in an office booking system. Without concurrency guards, the system is susceptible to race conditions (e.g., two users booking the same desk simultaneously).
+Concurrent starship docking requests are a high-risk scenario. Without concurrency guards, the station could suffer from "Double Docking" errors where two starships are assigned to the same physical bay.
 
 ## Decision
-We will use **Optimistic Locking** via JPA's `@Version` annotation on the `Desk` entity.
-- The `Desk` entity holds a `version` field.
+We will use **Optimistic Locking** via JPA's `@Version` annotation on the `DockingBay` entity.
+- The `DockingBay` entity holds a `version` field.
 - Hibernate automatically checks this field before every update.
-- If a version mismatch is detected at the database level, an `OptimisticLockingFailureException` is thrown.
+- If a version mismatch is detected (meaning another sector update occurred), an `OptimisticLockingFailureException` is thrown.
 
 ## Consequences
 - **Pros**: 
-  - Non-blocking: Multiple users can read and prepare bookings at once.
-  - Scale-friendly: No horizontal table-level locking required.
-  - Fail-safe: Detects conflicts at save-time.
+  - Non-blocking: Multiple starships can request scans simultaneously.
+  - Scale-friendly: No database-level row-locking required for read-heavy docking scans.
 - **Cons**: 
-  - UX Impact: Users who "lose the race" will need to retry or be notified of the failure.
-  - Requires explicit `@Version` handling in the entity.
+  - The "Arrival Scan" must be retried or the starship must wait if a conflict occurs.

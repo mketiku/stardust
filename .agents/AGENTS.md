@@ -1,44 +1,28 @@
-# Agent Development Best Practices
+# Professional Engineering Standards
 
-This repository serves as a baseline for high-quality, agent-driven engineering. We prioritize **Test-Driven Development (TDD)** and **Domain Integrity**.
+This guide defines the architectural and code quality standards for this repository. Adherence ensures maintainability, scalability, and high quality.
 
-## Repository Context
+## 1. Architectural Integrity (Hexagonal/Ports & Adapters)
+- **Domain Isolation**: The core logic must reside in the `domain` package and be 100% agnostic of external frameworks (Spring, JPA, Web).
+- **Dependency Flow**: Dependencies must point inward toward the Domain. External layers communicate via defined **Ports** (interfaces) in the domain.
+- **Enforcement**: Run `ArchitectureTest` (ArchUnit) after any structural change to verify boundaries.
 
-The **Office Booking System** is a JVM-based microservice built with **Kotlin** and **Spring Boot**. It manages physical workspace allocations (desks) for employees, ensuring departmental constraints and preventing concurrent booking conflicts.
+## 2. Concurrency & State Safety
+- **Anti-Pattern**: Avoid global state or uncontrolled shared-mutable state.
+- **Optimistic Locking**: Use `@Version` (JPA) for any high-contention resource state changes to prevent "Lost Updates."
+- **Transactional Atomicity**: Business operations that span multiple modifications must be wrapped in a single transaction.
 
-### Key Architectural Decisions
-- **TDD First**: Every feature begins with a failing test case. We maintain two types of tests:
-    - **Service Tests**: Mock-based unit tests for core domain logic.
-    - **Controller Tests**: `WebMvcTest` for API contract verification and exception mapping.
-- **Optimistic Locking**: We use JPA `@Version` on the `Desk` entity to handle race conditions in a distributed-friendly way.
-- **Transactional Atomicity**: State transitions (e.g., booking a desk *and* creating an audit record) are wrapped in `@Transactional` to prevent partial updates.
-- **Custom Domain Exceptions**: We use specific exceptions like `DepartmentMismatchException` to differentiate between client errors and system failures.
+## 3. Data Integrity & API Contracts
+- **DTO Pattern**: Internal persistence entities MUST NOT leak to the web layer. Always map to discrete `Response` and `Request` DTOs.
+- **Audit Trails**: Capture meaningful state transitions (e.g., creation, updates) rather than just overriding fields.
+- **Fail Fast**: Implement strict validation on all incoming requests before they reach the service layer.
 
-## Best Practices for AI Agents
+## 4. Operational Excellence
+- **Observability**: Instrument key business events using metrics (e.g., Micrometer) and structured logging.
+- **Clean Commits**: Use short, lowercase prefixes: `feat:`, `fix:`, `test:`, `arch:`, `sec:`, or `docs:`.
+- **Shift-Left Security**: Ensure high-severity dependencies are flagged in CI/CD.
 
-When contributing to this codebase, follow these standards:
-
-### 1. The Red-Green-Refactor Loop
-Always implement features in this order:
-1. Create/Update a test in `src/test/kotlin` that fails for the new requirement.
-2. Modify the `Service` or `Repository` to satisfy the test.
-3. Refactor for clarity and performance.
-
-### 2. Validation & Security
-- **Never Trust the Request Body**: Always fetch entities by ID from the database to verify their existence and current state before acting.
-- **Departmental Authorization**: Ensure cross-entity constraints (like Employee Department vs. Desk Zone) are checked in the service layer.
-- **Safe Error Responses**: Use a `GlobalExceptionHandler` to map internal exceptions to clean, standardized HTTP responses. Avoid leaking stack traces.
-
-### 3. Entity Integrity & Hexagonal Architecture
-- **Hexagonal Architecture (Ports & Adapters)**: We separate the **Domain** (logic/ports) from **Infrastructure** (JPA/Web).
-    - **Domain Port**: Define interfaces in `com.example.office.domain.port`.
-    - **Adapter**: Implement database-specific or web-specific logic in `com.example.office.infrastructure`.
-- **DTO Pattern**: Never expose database entities directly to the API. Always map domain models to DTOs (e.g., `DeskResponse`) in the controller or a mapper.
-- **Use Audit Trails**: Create an explicit `Booking` record when a desk is reserved to provide a historical log.
-- **Audit Domain Events**: Use Spring `ApplicationEventPublisher` to emit `DomainEvents` for side effects (e.g., async auditing, notifications). This keeps the core service decoupled from infrastructure-heavy tasks (Item 1 & 3 pattern).
-- **Prefer Lazy Loading**: Use `FetchType.LAZY` for entity relationships to avoid large memory footprints.
-
-### 4. Code Quality
-- **Type Safety**: Leverage Kotlin's null safety and strong typing.
-- **Succinct Commits**: Group related changes (Entity + Service + Test) into single atomic PRs/commits.
-- **Commit Suggestions**: Always suggest a succinct, lowercase git commit message (following Conventional Commits) upon completion of a task.
+## 5. Implementation Workflow
+1.  **Red-Green-Refactor**: Prioritize TDD for complex domain logic.
+2.  **ArchUnit Alignment**: Verify that new dependencies don't violate layer isolation.
+3.  **Proactive Verification**: Run `./gradlew test ktlintCheck` before finalizing any change.

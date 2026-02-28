@@ -1,23 +1,23 @@
-# Office Booking System
+# Stardust Station Control System
 
-This project is a refined exercise in **Test-Driven Development (TDD)**, focused on solving core domain challenges in a shared workspace environment. It demonstrates how to build a reliable, thread-safe reservation system using a clean, test-first approach.
+This project is a mission-critical **Docking & Resource Allocation Engine** for a deep-space station. It demonstrates how to build a reliable, thread-safe reservation system using a clean, test-first approach.
 
 ## The Mission
 
-The primary goal of this iteration was to transition from a permissive "trust-based" booking logic to an "enforced-rule" system. We addressed three critical engineering requirements:
+Stardust Station serves as a neutral hub for various interstellar fleets. The primary goal of this system is to manage the complex logistics of docking starships while enforcing strict safety and protocol rules:
 
-1.  **Floor-Based Permissions**: Mapping organizational structure to physical space by restricting desk bookings to specific department zones.
-2.  **Double-Booking Integrity**: Ensuring that state transitions (booking a desk) are guarded by strict occupancy checks.
-3.  **Race Condition Mitigation**: Leveraging Optimistic Locking via JPA `@Version` to handle high-concurrency scenarios where multiple users might attempt to reserve the same desk simultaneously.
+1.  **Fleet Protocol Enforcement**: Restricting docking bays to specific fleet affiliations (Science, Trading, Military) to ensure resource compatibility.
+2.  **Docking Integrity**: Ensuring that state transitions (assigning a bay) are guarded by strict occupancy checks to prevent catastrophic collisions.
+3.  **Concurrency Mitigation**: Leveraging Optimistic Locking via JPA `@Version` to handle high-concurrency scenarios where multiple starships might attempt to reserve the same docking bay simultaneously.
 
 ## Engineering Stack
 
-Chosen for type safety, performance, and developer experience:
-
 - **Language**: Kotlin 1.9.25 (Expressive, null-safe, and concise)
-- **Framework**: Spring Boot 3.4.1 (The industry standard for JVM microservices)
-- **Data Layer**: Spring Data JPA with H2 (Enabling fast, in-memory feedback loops during development)
-- **Testing Philosophy**: JUnit 5 & MockK (Focusing on behavior verification and isolation)
+- **Framework**: Spring Boot 3.4.1 
+- **Data Layer**: Spring Data JPA with H2 (In-memory feedback loops)
+- **Observability**: Spring Actuator & Micrometer (Prometheus metrics)
+- **Testing**: JUnit 5, MockK, and ArchUnit (Behavior & Architecture verification)
+- **Quality**: ktlint for automated style enforcement
 
 ## System Architecture & Patterns
 
@@ -28,18 +28,18 @@ The implementation follows **Hexagonal Architecture (Ports & Adapters)** princip
 ```mermaid
 graph TD
     subgraph Infrastructure
-        Web[BookingController]
+        Web[DockingController]
         DB[JpaRepositories]
     end
 
     subgraph Domain
-        Service[BookingService]
-        Port[RepositoryPorts]
-        Model[Entities & Exceptions]
+        Service[DockingService]
+        Port[StationRepositoryPorts]
+        Model[DockingBay & Starship]
     end
 
     subgraph DTO
-        Response[Booking/Desk DTOs]
+        Response[Docking/Manifest DTOs]
     end
 
     Web --> Service
@@ -48,18 +48,10 @@ graph TD
     Web -- maps to --> Response
 ```
 
-- **Domain Layer**: The heart of the application containing pure business logic (`BookingService`) and entity models. It remains agnostic of the database or web framework.
-- **Port Layer**: Interface definitions for out-bound communication (e.g., `DeskRepository`).
+- **Domain Layer**: The heart of the application containing pure business logic (`DockingService`) and entity models. It remains agnostic of the database or web framework.
+- **Port Layer**: Interface definitions for out-bound communication (e.g., `DockingBayRepository`).
 - **Infrastructure Layer**: Technical implementations of the ports (JPA/Hibernate) and entry points for the application (REST Controllers).
-- **DTO Pattern**: We use Data Transfer Objects to ensure that internal persistence models never leak to the API, allowing the contract to evolve independently of the database schema.
-
-## The TDD Workflow
-
-This project wasn't just built with tests; it was *driven* by them. The development cycle followed the strict Red-Green-Refactor loop:
-
-1.  **Red**: Defined the expected behavior in `BookingServiceTest.kt` (e.g., preventing unauthorized departmental bookings).
-2.  **Green**: Implemented the minimum viable logic in `BookingService.kt` to satisfy the failing tests.
-3.  **Refactor**: Cleaned up the implementation while maintaining a passing test suite.
+- **DTO Pattern**: We use Data Transfer Objects to ensure that internal persistence models never leak to the API.
 
 ## Getting Started
 
@@ -70,19 +62,19 @@ Construction and execution require **JDK 21**.
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd office-booking
+cd stardust-station
 
-# Execute the full test suite to verify the domain logic
+# Execute the full test suite
 ./gradlew test
 
-# Launch the application locally
+# Launch the station control locally
 ./gradlew bootRun
 ```
 
-## Logic Snapshot: `reserveDesk`
+## Logic Snapshot: `requestDocking`
 
-The core logic handles the following check-list before persisting state:
-- **Existence**: Does the desk/employee exist?
-- **Occupancy**: Is the desk currently free?
-- **Authorization**: Does the employee's department match the desk's designated zone?
-- **Concurrency**: Did another thread modify this desk while we were processing? (Managed by JPA Versioning)
+The core logic handles the following protocol check-list before authorizing docking:
+- **Existence**: Do the docking bay and starship registry exist?
+- **Occupancy**: Is the docking bay currently free?
+- **Protocol**: Does the starship's fleet affiliation match the bay's required protocol?
+- **Concurrency**: Did another sensor update this bay while we were processing? (Managed by JPA Versioning)

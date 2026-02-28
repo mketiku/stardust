@@ -1,1 +1,1 @@
-rootProject.name = "office-booking"
+rootProject.name = "stardust-station"

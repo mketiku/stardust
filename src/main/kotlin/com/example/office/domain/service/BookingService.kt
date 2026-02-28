@@ -3,6 +3,7 @@ package com.example.office.domain.service
 import com.example.office.domain.model.*
 import com.example.office.domain.port.*
 import com.example.office.domain.exception.DepartmentMismatchException
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -10,12 +11,14 @@ import org.springframework.transaction.annotation.Transactional
 class BookingService(
     private val deskRepository: DeskRepository,
     private val employeeRepository: EmployeeRepository,
-    private val bookingRepository: BookingRepository
+    private val bookingRepository: BookingRepository,
+    private val meterRegistry: MeterRegistry
 ) {
     /**
      * Refined implementation: 
      * - Returns the generated Booking ID.
      * - Creates a Booking audit record.
+     * - Records metrics for observability.
      */
     @Transactional
     fun reserveDesk(deskId: Long, employeeId: Long): Long? {
@@ -37,7 +40,12 @@ class BookingService(
         deskRepository.save(desk)
 
         val booking = Booking(desk = desk, employee = employee)
-        return bookingRepository.save(booking).id
+        val savedBooking = bookingRepository.save(booking)
+        
+        // Record successful reservation metric
+        meterRegistry.counter("desk_reservations", "department", employee.department).increment()
+        
+        return savedBooking.id
     }
 
     @Transactional

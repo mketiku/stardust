@@ -7,6 +7,7 @@ import com.example.office.domain.port.BookingRepository
 import com.example.office.domain.port.DeskRepository
 import com.example.office.domain.port.EmployeeRepository
 import com.example.office.domain.service.BookingService
+import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -19,7 +20,8 @@ class BookingServiceTest {
     private val deskRepository = mockk<DeskRepository>()
     private val employeeRepository = mockk<EmployeeRepository>()
     private val bookingRepository = mockk<BookingRepository>()
-    private val bookingService = BookingService(deskRepository, employeeRepository, bookingRepository)
+    private val meterRegistry = mockk<MeterRegistry>(relaxed = true)
+    private val bookingService = BookingService(deskRepository, employeeRepository, bookingRepository, meterRegistry)
 
     @Test
     fun `should allow booking when employee department matches desk zone`() {

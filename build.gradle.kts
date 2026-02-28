@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.jpa") version "1.9.25"
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "com.example"
@@ -39,6 +40,8 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
 }
 
 kotlin {

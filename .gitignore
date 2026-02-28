@@ -1,0 +1,55 @@
+### --- IDE Specifics --- ###
+
+## JetBrains (IntelliJ IDEA)
+.idea/
+*.iws
+*.iml
+*.ipr
+# Personal dictionary and shelves
+.idea/dictionaries
+.idea/shelf
+# Do not ignore 'modules.xml' or 'runConfigurations' if you want to share them
+# .idea/modules.xml
+# .idea/runConfigurations/
+
+## VS Code
+.vscode/
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+### --- Language & Build Tools --- ###
+
+## Java & Kotlin
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+## Gradle
+.gradle/
+build/
+# Ignore Gradle Wrapper jar (optional, but common to keep it)
+# !gradle/wrapper/gradle-wrapper.jar
+
+## Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.nextSnapshot
+pom.xml.releaseBackup
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### --- OS Specifics --- ###
+.DS_Store
+Thumbs.db

@@ -1,4 +1,4 @@
-package com.example.office.entity
+package com.example.office.domain.model
 
 import jakarta.persistence.*
 import java.time.LocalDateTime

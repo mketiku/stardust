@@ -1,7 +1,7 @@
-package com.example.office.controller
+package com.example.office.infrastructure.web
 
-import com.example.office.entity.Desk
-import com.example.office.service.BookingService
+import com.example.office.domain.model.Desk
+import com.example.office.domain.service.BookingService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import org.junit.jupiter.api.Test
@@ -45,7 +45,7 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should return 403 when department mismatch occurs`() {
-        every { bookingService.reserveDesk(any(), any()) } throws com.example.office.exception.DepartmentMismatchException("Mismatch")
+        every { bookingService.reserveDesk(any(), any()) } throws com.example.office.domain.exception.DepartmentMismatchException("Mismatch")
 
         val body = "{\"deskId\": 1, \"employeeId\": 1}"
         

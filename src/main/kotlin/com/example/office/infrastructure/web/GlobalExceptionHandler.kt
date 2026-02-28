@@ -1,5 +1,6 @@
-package com.example.office.exception
+package com.example.office.infrastructure.web
 
+import com.example.office.domain.exception.DepartmentMismatchException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice

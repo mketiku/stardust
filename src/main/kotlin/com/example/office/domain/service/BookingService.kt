@@ -1,6 +1,8 @@
-package com.example.office.service
+package com.example.office.domain.service
 
-import com.example.office.entity.*
+import com.example.office.domain.model.*
+import com.example.office.domain.port.*
+import com.example.office.domain.exception.DepartmentMismatchException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -8,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 class BookingService(
     private val deskRepository: DeskRepository,
     private val employeeRepository: EmployeeRepository,
-    private val bookingRepository: com.example.office.entity.BookingRepository
+    private val bookingRepository: BookingRepository
 ) {
     /**
      * Refined implementation: 
@@ -28,13 +30,13 @@ class BookingService(
         check(!desk.isOccupied) { "Desk ${desk.deskCode} is already occupied" }
 
         if (employee.department != desk.departmentZone) {
-            throw com.example.office.exception.DepartmentMismatchException("Employee department does not match desk zone")
+            throw DepartmentMismatchException("Employee department does not match desk zone")
         }
         
         desk.isOccupied = true
         deskRepository.save(desk)
 
-        val booking = com.example.office.entity.Booking(desk = desk, employee = employee)
+        val booking = Booking(desk = desk, employee = employee)
         return bookingRepository.save(booking).id
     }
 
@@ -51,7 +53,7 @@ class BookingService(
         bookingRepository.delete(booking)
     }
 
-    fun getCurrentBookings(): List<com.example.office.entity.Desk> {
+    fun getCurrentBookings(): List<Desk> {
         return deskRepository.findAllByIsOccupiedTrue()
     }
 }

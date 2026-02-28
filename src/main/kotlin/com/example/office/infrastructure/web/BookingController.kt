@@ -1,6 +1,7 @@
-package com.example.office.controller
+package com.example.office.infrastructure.web
 
-import com.example.office.service.BookingService
+import com.example.office.domain.service.BookingService
+import com.example.office.dto.DeskResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
@@ -19,7 +20,17 @@ class BookingController(
 
     @GetMapping
     @Operation(summary = "List current bookings", description = "Returns all desks that are currently marked as occupied.")
-    fun getBookings() = bookingService.getCurrentBookings()
+    fun getBookings(): List<DeskResponse> {
+        return bookingService.getCurrentBookings().map { desk ->
+            DeskResponse(
+                id = desk.id!!,
+                deskCode = desk.deskCode,
+                floorNumber = desk.floorNumber,
+                departmentZone = desk.departmentZone,
+                isOccupied = desk.isOccupied
+            )
+        }
+    }
 
     @DeleteMapping("/{id}")
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)

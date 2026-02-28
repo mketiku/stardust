@@ -29,10 +29,16 @@ Always implement features in this order:
 - **Departmental Authorization**: Ensure cross-entity constraints (like Employee Department vs. Desk Zone) are checked in the service layer.
 - **Safe Error Responses**: Use a `GlobalExceptionHandler` to map internal exceptions to clean, standardized HTTP responses. Avoid leaking stack traces.
 
-### 3. Entity Integrity
-- Use **Audit Trails**: Create an explicit `Booking` record when a desk is reserved to provide a historical log, rather than just flipping a boolean on the `Desk` entity.
-- Prefer **Lazy Loading**: Use `FetchType.LAZY` for entity relationships to avoid large memory footprints.
+### 3. Entity Integrity & Hexagonal Architecture
+- **Hexagonal Architecture (Ports & Adapters)**: We separate the **Domain** (logic/ports) from **Infrastructure** (JPA/Web).
+    - **Domain Port**: Define interfaces in `com.example.office.domain.port`.
+    - **Adapter**: Implement database-specific or web-specific logic in `com.example.office.infrastructure`.
+- **DTO Pattern**: Never expose database entities directly to the API. Always map domain models to DTOs (e.g., `DeskResponse`) in the controller or a mapper.
+- **Use Audit Trails**: Create an explicit `Booking` record when a desk is reserved to provide a historical log.
+- **Audit Domain Events**: Use Spring `ApplicationEventPublisher` to emit `DomainEvents` for side effects (e.g., async auditing, notifications). This keeps the core service decoupled from infrastructure-heavy tasks (Item 1 & 3 pattern).
+- **Prefer Lazy Loading**: Use `FetchType.LAZY` for entity relationships to avoid large memory footprints.
 
 ### 4. Code Quality
 - **Type Safety**: Leverage Kotlin's null safety and strong typing.
 - **Succinct Commits**: Group related changes (Entity + Service + Test) into single atomic PRs/commits.
+- **Commit Suggestions**: Always suggest a succinct, lowercase git commit message (following Conventional Commits) upon completion of a task.

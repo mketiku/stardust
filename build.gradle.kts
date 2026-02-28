@@ -37,6 +37,7 @@ dependencies {
 
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 }
 
 kotlin {

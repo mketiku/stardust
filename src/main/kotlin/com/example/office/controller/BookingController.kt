@@ -12,6 +12,9 @@ class BookingController(
     fun createBooking(@RequestBody request: BookingRequest) {
         bookingService.reserveDesk(request.deskId, request.employeeId)
     }
+
+    @GetMapping
+    fun getBookings() = bookingService.getCurrentBookings()
 }
 
 data class BookingRequest(

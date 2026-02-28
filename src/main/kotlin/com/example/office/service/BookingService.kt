@@ -21,10 +21,25 @@ class BookingService(
         val desk = deskRepository.findById(deskId).orElseThrow { 
             RuntimeException("Desk not found") 
         }
+
+        val employee = employeeRepository.findById(employeeId).orElseThrow {
+            RuntimeException("Employee not found")
+        }
+
+        if (desk.isOccupied) {
+            throw IllegalStateException("Desk is already occupied")
+        }
+
+        if (employee.department != desk.departmentZone) {
+            throw IllegalArgumentException("Employee department does not match desk zone")
+        }
         
-        // BUGGY LOGIC: Just sets isOccupied to true without any validation
         desk.isOccupied = true
         
         deskRepository.save(desk)
+    }
+
+    fun getCurrentBookings(): List<com.example.office.entity.Desk> {
+        return deskRepository.findAllByIsOccupiedTrue()
     }
 }

@@ -60,4 +60,18 @@ class BookingServiceTest {
 
         verify(exactly = 0) { deskRepository.save(any()) }
     }
+    
+    @Test
+    fun `should return all currently occupied desks`() {
+        val occupiedDesk1 = Desk(id = 1L, deskCode = "1A-01", floorNumber = 1, departmentZone = "ENG", isOccupied = true)
+        val occupiedDesk2 = Desk(id = 2L, deskCode = "1A-02", floorNumber = 1, departmentZone = "ENG", isOccupied = true)
+        
+        every { deskRepository.findAllByIsOccupiedTrue() } returns listOf(occupiedDesk1, occupiedDesk2)
+        
+        val results = bookingService.getCurrentBookings()
+        
+        assert(results.size == 2)
+        assert(results.all { it.isOccupied })
+        verify { deskRepository.findAllByIsOccupiedTrue() }
+    }
 }

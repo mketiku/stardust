@@ -35,8 +35,8 @@
 ## Gradle
 .gradle/
 build/
-# Ignore Gradle Wrapper jar (optional, but common to keep it)
-# !gradle/wrapper/gradle-wrapper.jar
+# Avoid ignoring Gradle Wrapper jar as it is required for CI/CD
+!gradle/wrapper/gradle-wrapper.jar
 
 ## Maven
 target/

@@ -5,12 +5,12 @@ data class DockingBayResponse(
     val bayCode: String,
     val deckLevel: Int,
     val requiredFleetAffiliation: String,
-    val isOccupied: Boolean
+    val isOccupied: Boolean,
 )
 
 data class DockingManifestResponse(
     val manifestId: Long,
     val dockingBay: DockingBayResponse,
     val starshipRegistry: String,
-    val fleetAffiliation: String
+    val fleetAffiliation: String,
 )

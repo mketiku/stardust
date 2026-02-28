@@ -3,7 +3,6 @@ package com.example.stardust.domain.service
 import com.example.stardust.domain.exception.FleetMismatchException
 import com.example.stardust.domain.model.DockingBay
 import com.example.stardust.domain.model.DockingManifest
-import com.example.stardust.domain.model.Starship
 import com.example.stardust.domain.port.DockingBayRepository
 import com.example.stardust.domain.port.DockingManifestRepository
 import com.example.stardust.domain.port.StarshipRepository
@@ -16,21 +15,26 @@ class DockingService(
     private val bayRepository: DockingBayRepository,
     private val starshipRepository: StarshipRepository,
     private val manifestRepository: DockingManifestRepository,
-    private val meterRegistry: MeterRegistry
+    private val meterRegistry: MeterRegistry,
 ) {
     /**
      * Records a starship arrival and assigns a docking bay.
      * Enforces fleet-to-bay compatibility protocols.
      */
     @Transactional
-    fun requestDocking(bayId: Long, starshipId: Long): Long? {
-        val bay = bayRepository.findById(bayId).orElseThrow {
-            RuntimeException("Docking bay not found")
-        }
+    fun requestDocking(
+        bayId: Long,
+        starshipId: Long,
+    ): Long? {
+        val bay =
+            bayRepository.findById(bayId).orElseThrow {
+                RuntimeException("Docking bay not found")
+            }
 
-        val starship = starshipRepository.findById(starshipId).orElseThrow {
-            RuntimeException("Starship registry not found")
-        }
+        val starship =
+            starshipRepository.findById(starshipId).orElseThrow {
+                RuntimeException("Starship registry not found")
+            }
 
         check(!bay.isOccupied) { "Docking Bay ${bay.bayCode} is already occupied" }
 
@@ -52,9 +56,10 @@ class DockingService(
 
     @Transactional
     fun departStation(manifestId: Long) {
-        val manifest = manifestRepository.findById(manifestId).orElseThrow {
-            RuntimeException("Docking manifest not found")
-        }
+        val manifest =
+            manifestRepository.findById(manifestId).orElseThrow {
+                RuntimeException("Docking manifest not found")
+            }
 
         val bay = manifest.dockingBay
         bay.isOccupied = false

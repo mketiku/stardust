@@ -14,14 +14,11 @@ class DockingManifest(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bay_id", nullable = false)
     val dockingBay: DockingBay,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "starship_id", nullable = false)
     val starship: Starship,
-
-    val arrivalTime: LocalDateTime = LocalDateTime.now()
+    val arrivalTime: LocalDateTime = LocalDateTime.now(),
 )

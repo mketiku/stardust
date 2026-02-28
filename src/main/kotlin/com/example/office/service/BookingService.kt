@@ -25,9 +25,7 @@ class BookingService(
             RuntimeException("Employee not found")
         }
 
-        if (desk.isOccupied) {
-            throw IllegalStateException("Desk is already occupied")
-        }
+        check(!desk.isOccupied) { "Desk ${desk.deskCode} is already occupied" }
 
         if (employee.department != desk.departmentZone) {
             throw com.example.office.exception.DepartmentMismatchException("Employee department does not match desk zone")

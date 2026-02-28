@@ -32,4 +32,9 @@ class BookingController(
 data class BookingRequest(
     val deskId: Long,
     val employeeId: Long
-)
+) {
+    init {
+        require(deskId > 0) { "deskId must be a positive number" }
+        require(employeeId > 0) { "employeeId must be a positive number" }
+    }
+}

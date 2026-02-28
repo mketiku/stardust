@@ -22,6 +22,12 @@ class GlobalExceptionHandler {
         return ResponseEntity(error, HttpStatus.FORBIDDEN)
     }
 
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleBadRequest(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+        val error = ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.message)
+        return ResponseEntity(error, HttpStatus.BAD_REQUEST)
+    }
+
     @ExceptionHandler(IllegalStateException::class)
     fun handleIllegalState(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(HttpStatus.CONFLICT.value(), ex.message)

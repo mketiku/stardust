@@ -12,16 +12,11 @@ class DockingBay(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     @Column(unique = true, nullable = false)
     val bayCode: String,
-
     val deckLevel: Int,
-
     val requiredFleetAffiliation: String,
-
     var isOccupied: Boolean = false,
-
     @Version
-    val version: Long = 0
+    val version: Long = 0,
 )

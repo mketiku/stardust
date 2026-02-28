@@ -20,12 +20,13 @@ class DockingServiceTest {
     private val starshipRepository = mockk<StarshipRepository>()
     private val manifestRepository = mockk<DockingManifestRepository>()
     private val meterRegistry = mockk<MeterRegistry>(relaxed = true)
-    private val dockingService = DockingService(
-        bayRepository,
-        starshipRepository,
-        manifestRepository,
-        meterRegistry
-    )
+    private val dockingService =
+        DockingService(
+            bayRepository,
+            starshipRepository,
+            manifestRepository,
+            meterRegistry,
+        )
 
     @Test
     fun `should allow docking when starship fleet matches bay protocol`() {

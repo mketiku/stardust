@@ -10,8 +10,6 @@ class Starship(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     val registryName: String,
-
-    val fleetAffiliation: String
+    val fleetAffiliation: String,
 )

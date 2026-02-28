@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class StationExceptionHandler {
-
     @ExceptionHandler(FleetMismatchException::class)
     fun handleFleetMismatch(ex: FleetMismatchException): ResponseEntity<StationErrorResponse> {
         val error = StationErrorResponse(HttpStatus.FORBIDDEN.value(), ex.message)
@@ -30,5 +29,5 @@ class StationExceptionHandler {
 
 data class StationErrorResponse(
     val status: Int,
-    val message: String?
+    val message: String?,
 )

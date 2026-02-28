@@ -4,6 +4,8 @@ import com.example.office.entity.Desk
 import com.example.office.entity.DeskRepository
 import com.example.office.entity.Employee
 import com.example.office.entity.EmployeeRepository
+import com.example.office.entity.BookingRepository
+import com.example.office.entity.Booking
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -15,7 +17,8 @@ class BookingServiceTest {
 
     private val deskRepository = mockk<DeskRepository>()
     private val employeeRepository = mockk<EmployeeRepository>()
-    private val bookingService = BookingService(deskRepository, employeeRepository)
+    private val bookingRepository = mockk<BookingRepository>()
+    private val bookingService = BookingService(deskRepository, employeeRepository, bookingRepository)
 
     @Test
     fun `should allow booking when employee department matches desk zone`() {
@@ -25,6 +28,7 @@ class BookingServiceTest {
         every { deskRepository.findById(1L) } returns Optional.of(desk)
         every { employeeRepository.findById(1L) } returns Optional.of(employee)
         every { deskRepository.save(any()) } returns desk
+        every { bookingRepository.save(any()) } returns Booking(id = 100L, desk = desk, employee = employee)
 
         bookingService.reserveDesk(1L, 1L)
 
@@ -96,6 +100,7 @@ class BookingServiceTest {
         every { deskRepository.findById(11L) } returns Optional.of(desk)
         every { employeeRepository.findById(6L) } returns Optional.of(employee)
         every { deskRepository.save(any()) } returns desk
+        every { bookingRepository.save(any()) } returns Booking(id = 101L, desk = desk, employee = employee)
 
         bookingService.reserveDesk(11L, 6L)
 
@@ -115,5 +120,39 @@ class BookingServiceTest {
         assertThrows(org.springframework.dao.OptimisticLockingFailureException::class.java) {
             bookingService.reserveDesk(12L, 7L)
         }
+    }
+
+    @Test
+    fun `should return booking id when successfully reserved`() {
+        val desk = Desk(id = 1L, deskCode = "4B-01", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = false)
+        val employee = Employee(id = 1L, name = "Alice", department = "ENGINEERING")
+        val booking = com.example.office.entity.Booking(id = 100L, desk = desk, employee = employee)
+
+        every { deskRepository.findById(1L) } returns Optional.of(desk)
+        every { employeeRepository.findById(1L) } returns Optional.of(employee)
+        every { deskRepository.save(any()) } returns desk
+        every { bookingRepository.save(any()) } returns booking
+
+        val bookingId = bookingService.reserveDesk(1L, 1L)
+
+        assert(bookingId == 100L)
+        verify { bookingRepository.save(any()) }
+    }
+
+    @Test
+    fun `should cancel booking and free up desk`() {
+        val desk = Desk(id = 1L, deskCode = "4B-01", floorNumber = 4, departmentZone = "ENGINEERING", isOccupied = true)
+        val employee = Employee(id = 1L, name = "Alice", department = "ENGINEERING")
+        val booking = com.example.office.entity.Booking(id = 100L, desk = desk, employee = employee)
+
+        every { bookingRepository.findById(100L) } returns Optional.of(booking)
+        every { deskRepository.save(any()) } returns desk
+        every { bookingRepository.delete(booking) } returns Unit
+
+        bookingService.cancelBooking(100L)
+
+        assert(!desk.isOccupied)
+        verify { deskRepository.save(match { !it.isOccupied }) }
+        verify { bookingRepository.delete(booking) }
     }
 }

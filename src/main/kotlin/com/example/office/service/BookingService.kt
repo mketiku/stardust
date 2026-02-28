@@ -1,23 +1,22 @@
 package com.example.office.service
 
-import com.example.office.entity.DeskRepository
-import com.example.office.entity.EmployeeRepository
+import com.example.office.entity.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BookingService(
     private val deskRepository: DeskRepository,
-    private val employeeRepository: EmployeeRepository
+    private val employeeRepository: EmployeeRepository,
+    private val bookingRepository: com.example.office.entity.BookingRepository
 ) {
     /**
-     * Buggy implementation: 
-     * - Lacks department/floor validation.
-     * - Lacks proper error handling.
-     * - Only sets isOccupied = true.
+     * Refined implementation: 
+     * - Returns the generated Booking ID.
+     * - Creates a Booking audit record.
      */
     @Transactional
-    fun reserveDesk(deskId: Long, employeeId: Long) {
+    fun reserveDesk(deskId: Long, employeeId: Long): Long? {
         val desk = deskRepository.findById(deskId).orElseThrow { 
             RuntimeException("Desk not found") 
         }
@@ -35,8 +34,23 @@ class BookingService(
         }
         
         desk.isOccupied = true
-        
         deskRepository.save(desk)
+
+        val booking = com.example.office.entity.Booking(desk = desk, employee = employee)
+        return bookingRepository.save(booking).id
+    }
+
+    @Transactional
+    fun cancelBooking(bookingId: Long) {
+        val booking = bookingRepository.findById(bookingId).orElseThrow {
+            RuntimeException("Booking not found")
+        }
+        
+        val desk = booking.desk
+        desk.isOccupied = false
+        deskRepository.save(desk)
+        
+        bookingRepository.delete(booking)
     }
 
     fun getCurrentBookings(): List<com.example.office.entity.Desk> {

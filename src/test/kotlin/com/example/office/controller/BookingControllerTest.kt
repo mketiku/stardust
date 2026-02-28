@@ -31,6 +31,19 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
+    fun `should return booking id on success`() {
+        every { bookingService.reserveDesk(any(), any()) } returns 100L
+
+        val body = "{\"deskId\": 1, \"employeeId\": 1}"
+        
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/bookings")
+            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .content(body))
+            .andExpect(status().isOk)
+            .andExpect(content().string("100"))
+    }
+
+    @Test
     fun `should return 403 when department mismatch occurs`() {
         every { bookingService.reserveDesk(any(), any()) } throws com.example.office.exception.DepartmentMismatchException("Mismatch")
 
@@ -54,5 +67,13 @@ class BookingControllerTest(@Autowired val mockMvc: MockMvc) {
             .content(body))
             .andExpect(status().isConflict)
             .andExpect(jsonPath("$.message").value("Occupied"))
+    }
+
+    @Test
+    fun `should return 204 when booking is cancelled`() {
+        every { bookingService.cancelBooking(100L) } returns Unit
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/bookings/100"))
+            .andExpect(status().isNoContent)
     }
 }

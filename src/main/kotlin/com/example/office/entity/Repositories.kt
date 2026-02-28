@@ -10,3 +10,6 @@ interface DeskRepository : JpaRepository<Desk, Long> {
 
 @Repository
 interface EmployeeRepository : JpaRepository<Employee, Long>
+
+@Repository
+interface BookingRepository : JpaRepository<Booking, Long>

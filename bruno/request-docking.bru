@@ -1,0 +1,18 @@
+meta {
+  name: Request Docking
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/request
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "bayId": 3,
+    "starshipId": 1
+  }
+}

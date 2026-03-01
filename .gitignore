@@ -5,12 +5,9 @@
 *.iws
 *.iml
 *.ipr
-# Personal dictionary and shelves
+out/
 .idea/dictionaries
 .idea/shelf
-# Do not ignore 'modules.xml' or 'runConfigurations' if you want to share them
-# .idea/modules.xml
-# .idea/runConfigurations/
 
 ## VS Code
 .vscode/
@@ -18,9 +15,18 @@
 *.code-workspace
 .history/
 
+## Eclipse
+.metadata
+.classpath
+.project
+.settings/
+bin/
+
+
 ### --- Language & Build Tools --- ###
 
 ## Java & Kotlin
+.kotlin/
 *.class
 *.log
 *.ctxt
@@ -32,11 +38,17 @@
 *.tar.gz
 *.rar
 
+## Local Environment & Secrets
+.env
+.env.local
+local.properties
+bruno-local.json
+
 ## Gradle
 .gradle/
 build/
-# Ignore Gradle Wrapper jar (optional, but common to keep it)
-# !gradle/wrapper/gradle-wrapper.jar
+# Allow Gradle Wrapper jar for CI portability
+!gradle/wrapper/gradle-wrapper.jar
 
 ## Maven
 target/
@@ -53,3 +65,7 @@ buildNumber.properties
 ### --- OS Specifics --- ###
 .DS_Store
 Thumbs.db
+
+
+### --- Project Specifics --- ###
+# Add project-specific ignores below

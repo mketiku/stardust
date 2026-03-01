@@ -22,7 +22,10 @@ class DockingController(
     private val dockingService: DockingService,
 ) {
     @PostMapping("/request")
-    @Operation(summary = "Request docking", description = "Validates fleet affiliation and bay occupancy before authorizing docking.")
+    @Operation(
+        summary = "Request docking",
+        description = "Validates fleet affiliation and bay occupancy before authorizing docking.",
+    )
     fun requestDocking(
         @RequestBody request: DockingRequest,
     ): Long? = dockingService.requestDocking(request.bayId, request.starshipId)

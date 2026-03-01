@@ -25,7 +25,14 @@ class DockingControllerTest(
 
     @Test
     fun `should return active docking bays`() {
-        val bay = DockingBay(id = 1L, bayCode = "BAY-01", deckLevel = 4, requiredFleetAffiliation = "SCIENCE", isOccupied = true)
+        val bay =
+            DockingBay(
+                id = 1L,
+                bayCode = "BAY-01",
+                deckLevel = 4,
+                requiredFleetAffiliation = "SCIENCE",
+                isOccupied = true,
+            )
 
         every { dockingService.getActiveDocks() } returns listOf(bay)
 
@@ -37,7 +44,14 @@ class DockingControllerTest(
 
     @Test
     fun `should return manifest detail for valid id`() {
-        val bay = DockingBay(id = 1L, bayCode = "BAY-01", deckLevel = 4, requiredFleetAffiliation = "SCIENCE", isOccupied = true)
+        val bay =
+            DockingBay(
+                id = 1L,
+                bayCode = "BAY-01",
+                deckLevel = 4,
+                requiredFleetAffiliation = "SCIENCE",
+                isOccupied = true,
+            )
         val ship = Starship(id = 1L, registryName = "USS Discovery", fleetAffiliation = "SCIENCE")
         val manifest = DockingManifest(id = 100L, dockingBay = bay, starship = ship)
 

@@ -30,7 +30,14 @@ class DockingServiceTest {
 
     @Test
     fun `should allow docking when starship fleet matches bay protocol`() {
-        val bay = DockingBay(id = 1L, bayCode = "BAY-01", deckLevel = 4, requiredFleetAffiliation = "SCIENCE", isOccupied = false)
+        val bay =
+            DockingBay(
+                id = 1L,
+                bayCode = "BAY-01",
+                deckLevel = 4,
+                requiredFleetAffiliation = "SCIENCE",
+                isOccupied = false,
+            )
         val ship = Starship(id = 1L, registryName = "USS Discovery", fleetAffiliation = "SCIENCE")
 
         every { bayRepository.findById(1L) } returns Optional.of(bay)
@@ -45,7 +52,14 @@ class DockingServiceTest {
 
     @Test
     fun `should prevent docking when starship fleet does not match bay protocol`() {
-        val bay = DockingBay(id = 1L, bayCode = "BAY-01", deckLevel = 4, requiredFleetAffiliation = "MILITARY", isOccupied = false)
+        val bay =
+            DockingBay(
+                id = 1L,
+                bayCode = "BAY-01",
+                deckLevel = 4,
+                requiredFleetAffiliation = "MILITARY",
+                isOccupied = false,
+            )
         val ship = Starship(id = 1L, registryName = "USS Enterprise", fleetAffiliation = "SCIENCE")
 
         every { bayRepository.findById(1L) } returns Optional.of(bay)
@@ -60,7 +74,14 @@ class DockingServiceTest {
 
     @Test
     fun `should return manifest when valid id is provided`() {
-        val bay = DockingBay(id = 1L, bayCode = "BAY-01", deckLevel = 4, requiredFleetAffiliation = "SCIENCE", isOccupied = true)
+        val bay =
+            DockingBay(
+                id = 1L,
+                bayCode = "BAY-01",
+                deckLevel = 4,
+                requiredFleetAffiliation = "SCIENCE",
+                isOccupied = true,
+            )
         val ship = Starship(id = 1L, registryName = "USS Discovery", fleetAffiliation = "SCIENCE")
         val manifest = DockingManifest(id = 100L, dockingBay = bay, starship = ship)
 

@@ -23,7 +23,7 @@ class ArchitectureTest {
                 "DomainService",
                 "Infrastructure",
                 "Web",
-                "Persistence"
+                "Persistence",
             )
             .whereLayer("DomainPort").mayOnlyBeAccessedByLayers("DomainService", "Infrastructure", "Persistence")
             .whereLayer("DomainService").mayOnlyBeAccessedByLayers("Web")

@@ -12,12 +12,46 @@ Stardust Station serves as a neutral hub for various interstellar fleets. The pr
 
 ## Engineering Stack
 
-- **Language**: Kotlin 1.9.25 (Expressive, null-safe, and concise)
-- **Framework**: Spring Boot 3.4.1 
-- **Data Layer**: Spring Data JPA with H2 (In-memory feedback loops)
+- **Language**: Kotlin 2.1.20 (Expressive, null-safe, and AI-native)
+- **Framework**: Spring Boot 3.4.3 
+- **AI/MCP**: Spring AI MCP (Model Context Protocol) ready
+- **Data Layer**: Spring Data JPA with H2 (In-memory persistence)
 - **Observability**: Spring Actuator & Micrometer (Prometheus metrics)
-- **Testing**: JUnit 5, MockK, and ArchUnit (Behavior & Architecture verification)
-- **Quality**: ktlint for automated style enforcement
+- **Testing**: JUnit 5, MockK, and ArchUnit
+- **Quality**: ktlint 14.0.1 for automated style enforcement
+
+## Quick Start
+
+### Prerequisites
+- Java 21+
+
+### Local Development
+```bash
+# Clone the repository
+git clone <repository-url>
+cd stardust-station
+
+# Launch the station control locally
+./gradlew bootRun
+```
+
+The service will be available at `http://localhost:8080`.
+
+## Development Standards
+
+Before pushing any code, ensure it meets the station's quality and style requirements:
+
+1. **Format Code**: Run the auto-formatter to maintain consistency.
+   ```bash
+   ./gradlew ktlintFormat
+   ```
+2. **Verify Quality**: Run the lint check and all unit tests.
+   ```bash
+   ./gradlew check
+   ```
+
+## Documentation
+- [Architecture Decision Records (ADRs)](docs/adr/)
 
 ## System Architecture & Patterns
 
@@ -48,33 +82,11 @@ graph TD
     Web -- maps to --> Response
 ```
 
-- **Domain Layer**: The heart of the application containing pure business logic (`DockingService`) and entity models. It remains agnostic of the database or web framework.
-- **Port Layer**: Interface definitions for out-bound communication (e.g., `DockingBayRepository`).
-- **Infrastructure Layer**: Technical implementations of the ports (JPA/Hibernate) and entry points for the application (REST Controllers).
-- **DTO Pattern**: We use Data Transfer Objects to ensure that internal persistence models never leak to the API.
+### Why Hexagonal Architecture?
+Hexagonal (also known as Ports and Adapters) is the ideal architectural pattern for Stardust Station because:
 
-## Getting Started
+1. **Inversion of Control**: The core Domain logic (the "Inside") defines its dependencies via Interfaces (Ports). Technical implementation details (the "Outside") like H2 or REST are kept separate.
+2. **Testability**: Business logic can be tested in complete isolation without starting a heavy Spring Context or Database.
 
-### Prerequisites
-Construction and execution require **JDK 21**.
-
-### Setup
-```bash
-# Clone the repository
-git clone <repository-url>
-cd stardust-station
-
-# Execute the full test suite
-./gradlew test
-
-# Launch the station control locally
-./gradlew bootRun
-```
-
-## Logic Snapshot: `requestDocking`
-
-The core logic handles the following protocol check-list before authorizing docking:
-- **Existence**: Do the docking bay and starship registry exist?
-- **Occupancy**: Is the docking bay currently free?
-- **Protocol**: Does the starship's fleet affiliation match the bay's required protocol?
-- **Concurrency**: Did another sensor update this bay while we were processing? (Managed by JPA Versioning)
+---
+*Stardust Station: Integrity through Architecture.*
